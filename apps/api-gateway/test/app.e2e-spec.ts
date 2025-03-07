@@ -16,7 +16,7 @@ describe('ApiGatewayController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
+    return request(app.getHttpServer() as unknown as string)
       .get('/')
       .expect(200)
       .expect('Pix Forge api service!');
