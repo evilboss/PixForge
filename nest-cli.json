@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/pixforge/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/pixforge/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/pixforge",
+  "projects": {
+    "image-cropping": {
+      "type": "application",
+      "root": "apps/image-cropping",
+      "entryFile": "main",
+      "sourceRoot": "apps/image-cropping/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/image-cropping/tsconfig.app.json"
+      }
+    },
+    "image-processing": {
+      "type": "application",
+      "root": "apps/image-processing",
+      "entryFile": "main",
+      "sourceRoot": "apps/image-processing/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/image-processing/tsconfig.app.json"
+      }
+    },
+    "pixforge": {
+      "type": "application",
+      "root": "apps/pixforge",
+      "entryFile": "main",
+      "sourceRoot": "apps/pixforge/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pixforge/tsconfig.app.json"
+      }
+    },
+    "shared-storage": {
+      "type": "library",
+      "root": "libs/shared-storage",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared-storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared-storage/tsconfig.lib.json"
+      }
+    }
+  }
+}
