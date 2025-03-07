@@ -10,22 +10,13 @@
   "monorepo": true,
   "root": "apps/pixforge",
   "projects": {
-    "image-cropping": {
+    "api-gateway": {
       "type": "application",
-      "root": "apps/image-cropping",
+      "root": "apps/api-gateway",
       "entryFile": "main",
-      "sourceRoot": "apps/image-cropping/src",
+      "sourceRoot": "apps/api-gateway/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/image-cropping/tsconfig.app.json"
-      }
-    },
-    "image-processing": {
-      "type": "application",
-      "root": "apps/image-processing",
-      "entryFile": "main",
-      "sourceRoot": "apps/image-processing/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/image-processing/tsconfig.app.json"
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
     "pixforge": {
