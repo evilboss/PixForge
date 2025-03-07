@@ -28,14 +28,5 @@
         "tsConfigPath": "apps/pixforge/tsconfig.app.json"
       }
     },
-    "shared-storage": {
-      "type": "library",
-      "root": "libs/shared-storage",
-      "entryFile": "index",
-      "sourceRoot": "libs/shared-storage/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/shared-storage/tsconfig.lib.json"
-      }
-    }
   }
 }

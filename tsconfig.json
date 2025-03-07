@@ -17,13 +17,5 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@app/shared-storage": [
-        "libs/shared-storage/src"
-      ],
-      "@app/shared-storage/*": [
-        "libs/shared-storage/src/*"
-      ]
-    }
   }
 }
