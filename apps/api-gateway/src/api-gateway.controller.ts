@@ -7,6 +7,6 @@ export class ApiGatewayController {
 
   @Get()
   getHello(): string {
-    return this.apiGatewayService.getHello();
+    return this.apiGatewayService.getName();
   }
 }
