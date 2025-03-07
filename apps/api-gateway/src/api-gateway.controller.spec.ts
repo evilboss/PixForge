@@ -15,8 +15,8 @@ describe('ApiGatewayController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(apiGatewayController.getHello()).toBe('Hello World!');
+    it('should return "Pix Forge api service!"', () => {
+      expect(apiGatewayController.getHello()).toBe('Pix Forge api service!');
     });
   });
 });
