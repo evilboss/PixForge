@@ -19,6 +19,15 @@
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
+    "image-processing": {
+      "type": "application",
+      "root": "apps/image-processing",
+      "entryFile": "main",
+      "sourceRoot": "apps/image-processing/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/image-processing/tsconfig.app.json"
+      }
+    },
     "pixforge": {
       "type": "application",
       "root": "apps/pixforge",
@@ -28,5 +37,14 @@
         "tsConfigPath": "apps/pixforge/tsconfig.app.json"
       }
     },
+    "shared-storage": {
+      "type": "library",
+      "root": "libs/shared-storage",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared-storage/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared-storage/tsconfig.lib.json"
+      }
+    }
   }
 }

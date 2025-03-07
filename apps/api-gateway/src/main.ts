@@ -20,7 +20,6 @@ async function bootstrap() {
   }
 }
 
-// ✅ Explicitly handle the promise
 bootstrap().catch((err) => {
   console.error('❌ Unexpected error in bootstrap:', err);
   process.exit(1);
