@@ -29,5 +29,5 @@ jobs:
       - name: 📊 Generate Coverage Report
         run: yarn test:cov
 
-      - name: ✅ Lint Code (Optional)
+      - name: ✅ Lint Code
         run: yarn lint
