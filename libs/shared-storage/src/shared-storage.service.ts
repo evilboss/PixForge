@@ -40,16 +40,16 @@ export class SharedStorageService {
         key: (
           req: Request,
           file: Express.Multer.File,
-          cb: (error: Error | null, key?: string) => void,
+          callback: (error: Error | null, key: string) => void,
         ): void => {
           const { originalname } = file;
 
           if (!originalname) {
-            cb(new BadRequestException('Invalid file'), undefined);
+            callback(new BadRequestException('Invalid file'), '');
             return;
           }
 
-          cb(null, `uploads/${Date.now()}-${originalname}`);
+          callback(null, `uploads/${Date.now()}-${originalname}`);
         },
       });
     } else {
@@ -64,25 +64,69 @@ export class SharedStorageService {
         destination: (
           req: Request,
           file: Express.Multer.File,
-          cb: (error: Error | null, destination?: string) => void,
+          callback: (error: Error | null, destination: string) => void,
         ): void => {
-          cb(null, uploadDir);
+          callback(null, uploadDir);
         },
         filename: (
           req: Request,
           file: Express.Multer.File,
-          cb: (error: Error | null, filename?: string) => void,
+          callback: (error: Error | null, filename: string) => void,
         ): void => {
           const { originalname } = file;
 
           if (!originalname) {
-            cb(new BadRequestException('Invalid file name'), '');
+            callback(
+              new BadRequestException('Invalid file name'),
+              `${Date.now()}.tmp`,
+            );
             return;
           }
 
-          cb(null, `${Date.now()}-${originalname}`);
+          callback(null, `${Date.now()}-${originalname}`);
         },
       });
+    }
+  }
+
+  /**
+   * Converts image to WebP and generates variations based on type.
+   */
+  async processImage(
+    filePath: string,
+    imageType: 'game' | 'promotion',
+  ): Promise<{ original: string; variations: Record<string, string> }> {
+    try {
+      const baseFileName = path.basename(filePath, path.extname(filePath));
+      const outputDir = path.dirname(filePath);
+      const webpFilePath = path.join(outputDir, `${baseFileName}.webp`);
+      const variations: Record<string, string> = {};
+
+      // Convert to WebP
+      await sharp(filePath).toFormat('webp').toFile(webpFilePath);
+
+      // Create different sizes based on image type
+      if (imageType === 'game') {
+        const thumbnailPath = path.join(
+          outputDir,
+          `${baseFileName}-thumbnail.webp`,
+        );
+        await sharp(webpFilePath).resize(184, 256).toFile(thumbnailPath);
+        variations['thumbnail'] = thumbnailPath;
+      } else if (imageType === 'promotion') {
+        const resizedPath = path.join(
+          outputDir,
+          `${baseFileName}-resized.webp`,
+        );
+        await sharp(webpFilePath).resize(361, 240).toFile(resizedPath);
+        variations['resized'] = resizedPath;
+      }
+
+      return { original: webpFilePath, variations };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Error processing image: ${(error as Error).message}`,
+      );
     }
   }
 
