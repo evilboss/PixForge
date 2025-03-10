@@ -6,8 +6,8 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import * as AWS from 'aws-sdk';
-import { Request } from 'express';
-import * as multer from 'multer';
+import { Express, Request } from 'express';
+import multer, { StorageEngine } from 'multer';
 import multerS3, { AUTO_CONTENT_TYPE } from 'multer-s3';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class SharedStorageService {
   /**
    * Returns the appropriate Multer storage configuration (Local or AWS S3)
    */
-  getMulterStorage(): multer.StorageEngine {
+  getMulterStorage(): StorageEngine {
     if (this.useAws && this.s3) {
       return multerS3({
         s3: this.s3,
@@ -91,8 +91,6 @@ export class SharedStorageService {
    * @returns The stored file path or S3 URL.
    */
   async saveFile(file: Express.Multer.File, folder: string): Promise<string> {
-    // ✅ Destructure `file` to ensure all necessary properties exist
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { originalname, buffer, mimetype } = file;
 
     if (!originalname || !buffer || !mimetype) {
@@ -104,8 +102,8 @@ export class SharedStorageService {
       const params: AWS.S3.PutObjectRequest = {
         Bucket: process.env.AWS_S3_BUCKET as string,
         Key: fileName,
-        Body: buffer as AWS.S3.Body,
-        ContentType: mimetype as AWS.S3.ContentType,
+        Body: buffer,
+        ContentType: mimetype,
       };
 
       try {
@@ -139,11 +137,10 @@ export class SharedStorageService {
     error: unknown,
     context: string,
   ): InternalServerErrorException {
-    if (error instanceof Error) {
-      return new InternalServerErrorException(
-        `Failed ${context}: ${error.message}`,
-      );
-    }
-    return new InternalServerErrorException(`Failed ${context}: Unknown error`);
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    return new InternalServerErrorException(
+      `Failed ${context}: ${errorMessage}`,
+    );
   }
 }
