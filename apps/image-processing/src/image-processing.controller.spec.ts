@@ -11,7 +11,9 @@ describe('ImageProcessingController', () => {
       providers: [ImageProcessingService],
     }).compile();
 
-    imageProcessingController = app.get<ImageProcessingController>(ImageProcessingController);
+    imageProcessingController = app.get<ImageProcessingController>(
+      ImageProcessingController,
+    );
   });
 
   describe('root', () => {
