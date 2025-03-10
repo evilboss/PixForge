@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ImageProcessingModule } from './../src/image-processing.module';
+import { ImageProcessingModule } from '../src/image-processing.module';
 
-describe('ImageProcessingController (e2e)', () => {
+describe('Image Processing (e2e)', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [ImageProcessingModule],
     }).compile();
@@ -15,10 +15,17 @@ describe('ImageProcessingController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('/images/upload (POST) should return success', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/images/upload')
+      .attach('file', Buffer.from('test'), { filename: 'test.png' })
+      .field('imageType', 'game');
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('message', 'Image uploaded successfully!');
   });
 });

@@ -15,10 +15,4 @@ describe('ImageProcessingController', () => {
       ImageProcessingController,
     );
   });
-
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(imageProcessingController.getHello()).toBe('Hello World!');
-    });
-  });
 });
