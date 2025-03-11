@@ -2,59 +2,48 @@ import {
   Controller,
   Post,
   UploadedFile,
+  Body,
   UseInterceptors,
-  BadRequestException,
-  UnsupportedMediaTypeException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { SharedStorageService } from '@app/shared-storage';
-import { Express } from 'express';
+import { ImageProcessingService } from './image-processing.service';
 
-@Controller('/')
+@Controller() // The root path is automatically inferred
 export class ImageProcessingController {
-  constructor(private readonly storageService: SharedStorageService) {}
+  constructor(
+    private readonly imageProcessingService: ImageProcessingService,
+  ) {}
 
-  /**
-   * Handles file upload and delegates processing to the storage service.
-   */
-  @Post()
+  @Post('/') // Explicitly bind the POST request to the root path
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile('file') file: Express.Multer.File) {
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('imageType') imageType: 'game' | 'promotion', // Get the image type from the body
+  ) {
+    // Validate the file and imageType directly in the controller
     if (!file) {
-      throw new BadRequestException('No file uploaded.');
+      throw new Error('File is required');
     }
 
-
-    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/webp'];
-    console.log(
-      'file',
-      file,
-      file.mimetype,
-      'allowed',
-      allowedMimeTypes.includes(file.mimetype),
-    );
-
-    if (
-      !allowedMimeTypes.includes(file.mimetype)
-    ) {
-      throw new UnsupportedMediaTypeException(
-        'Only PNG, JPEG, and WebP images are allowed',
+    if (!imageType || !['game', 'promotion'].includes(imageType)) {
+      throw new Error(
+        'Invalid image type. Must be either "game" or "promotion".',
       );
     }
 
-    // const imageType: 'game' | 'promotion' | undefined =
-    //   file.originalname.includes('game')
-    //     ? 'game'
-    //     : file.originalname.includes('promotion')
-    //       ? 'promotion'
-    //       : undefined;
+    // Process the image and upload it
+    const result = await this.imageProcessingService.processAndStoreImage(
+      file,
+      imageType,
+    );
 
-    // Process file using shared storage service
-    const result = await this.storageService.saveFile(file, 'uploads');
-
-    return {
+    // Structure the response based on the image type
+    const response = {
       message: 'Image uploaded successfully!',
-      ...result,
+      original: result.original, // The WebP file path
+      variations: result.variations, // Thumbnail or resized, based on the image type
     };
+
+    return response;
   }
 }

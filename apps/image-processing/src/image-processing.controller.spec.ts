@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ImageProcessingController } from './image-processing.controller';
 import { SharedStorageService } from '@app/shared-storage';
+import { ImageProcessingService } from './image-processing.service';
 import { Express } from 'express';
 import {
   BadRequestException,
@@ -9,19 +10,29 @@ import {
 
 describe('ImageProcessingController', () => {
   let controller: ImageProcessingController;
-  let storageService: SharedStorageService;
+  let imageProcessingService: ImageProcessingService;
+  let sharedStorageService: SharedStorageService;
 
-  const mockStorageService = {
-    saveFile: jest.fn().mockResolvedValue({
+  const mockImageProcessingService = {
+    processAndStoreImage: jest.fn().mockResolvedValue({
+      message: 'Image uploaded successfully!',
       original: '/uploads/test-image.webp',
       variations: { thumbnail: '/uploads/test-image-thumbnail.webp' },
     }),
+  };
+
+  const mockStorageService = {
+    uploadSingleFile: jest.fn().mockResolvedValue('/uploads/test-image.webp'),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ImageProcessingController],
       providers: [
+        {
+          provide: ImageProcessingService,
+          useValue: mockImageProcessingService,
+        },
         {
           provide: SharedStorageService,
           useValue: mockStorageService,
@@ -32,9 +43,14 @@ describe('ImageProcessingController', () => {
     controller = module.get<ImageProcessingController>(
       ImageProcessingController,
     );
-    storageService = module.get<SharedStorageService>(SharedStorageService);
+    imageProcessingService = module.get<ImageProcessingService>(
+      ImageProcessingService,
+    );
+    sharedStorageService =
+      module.get<SharedStorageService>(SharedStorageService);
 
-    jest.spyOn(storageService, 'saveFile');
+    jest.spyOn(imageProcessingService, 'processAndStoreImage');
+    jest.spyOn(sharedStorageService, 'uploadSingleFile');
   });
 
   it('should be defined', () => {
@@ -42,26 +58,28 @@ describe('ImageProcessingController', () => {
   });
 
   it('should return 400 if no file is uploaded', async () => {
-    await expect(controller.uploadFile(null as any)).rejects.toThrow(
-      new BadRequestException('No file uploaded.'),
+    await expect(controller.uploadImage(null as any, 'game')).rejects.toThrow(
+      new BadRequestException('File is required'),
     );
   });
 
-  it('should return 415 if an unsupported file format is uploaded', async () => {
+  it('should return 400 if an invalid image type is provided', async () => {
     const mockFile = {
-      originalname: 'test.txt',
+      originalname: 'test-game.png',
       buffer: Buffer.from('test'),
-      mimetype: 'text/plain',
+      mimetype: 'image/png',
     } as Express.Multer.File;
 
-    await expect(controller.uploadFile(mockFile)).rejects.toThrow(
-      new UnsupportedMediaTypeException(
-        'Only PNG, JPEG, and WebP images are allowed',
+    await expect(
+      controller.uploadImage(mockFile, 'invalidType' as any),
+    ).rejects.toThrow(
+      new BadRequestException(
+        'Invalid image type. Must be either "game" or "promotion".',
       ),
     );
   });
 
-  it('should process and return a successful response', async () => {
+  it('should process and return a successful response for game image type', async () => {
     const mockFile: Express.Multer.File = {
       originalname: 'test-game.png',
       buffer: Buffer.from('test'),
@@ -75,17 +93,41 @@ describe('ImageProcessingController', () => {
       path: '',
     };
 
-    const response = await controller.uploadFile(mockFile);
+    const result = await controller.uploadImage(mockFile, 'game');
 
-    expect(response).toHaveProperty('message', 'Image uploaded successfully!');
-    expect(response).toHaveProperty('original', '/uploads/test-image.webp');
-    expect(response.variations).toHaveProperty(
+    expect(result).toHaveProperty('message', 'Image uploaded successfully!');
+    expect(result).toHaveProperty('original', '/uploads/test-image.webp');
+    expect(result.variations).toHaveProperty(
       'thumbnail',
       '/uploads/test-image-thumbnail.webp',
     );
   });
 
-  it('should call the storage service method once', async () => {
+  it('should process and return a successful response for promotion image type', async () => {
+    const mockFile: Express.Multer.File = {
+      originalname: 'test-promotion.png',
+      buffer: Buffer.from('test'),
+      mimetype: 'image/png',
+      fieldname: 'file',
+      encoding: '',
+      size: 1000,
+      stream: null as any,
+      destination: '',
+      filename: '',
+      path: '',
+    };
+
+    const result = await controller.uploadImage(mockFile, 'promotion');
+
+    expect(result).toHaveProperty('message', 'Image uploaded successfully!');
+    expect(result).toHaveProperty('original', '/uploads/test-image.webp');
+    expect(result.variations).toHaveProperty(
+      'thumbnail',
+      '/uploads/test-image-thumbnail.webp',
+    );
+  });
+
+  it('should call the imageProcessingService processAndStoreImage method once', async () => {
     const mockFile: Express.Multer.File = {
       originalname: 'test-game.png',
       buffer: Buffer.from('test'),
@@ -99,8 +141,7 @@ describe('ImageProcessingController', () => {
       path: '',
     };
 
-    await controller.uploadFile(mockFile);
-
-    expect(storageService.saveFile).toHaveBeenCalled();
+    await controller.uploadImage(mockFile, 'game');
+    expect(imageProcessingService.processAndStoreImage).toHaveBeenCalled();
   });
 });

@@ -1,16 +1,34 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  BadRequestException,
+} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as multer from 'multer';
 
-@Injectable()
-export class UploadMiddleware implements NestMiddleware {
-  private readonly upload = multer({ storage: multer.memoryStorage() }).single('file');
+// Configure multer (storing files in the 'uploads/' directory)
+const upload = multer({ dest: 'uploads/' });
 
+@Injectable()
+export class ImageProcessingMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    this.upload(req, res, (err: any) => {
+    console.log('📌 Middleware invoked');
+
+    // Call multer to process file upload
+    upload.single('file')(req, res, (err: any) => {
       if (err) {
-        return res.status(400).json({ message: 'File upload failed' });
+        console.error('❌ Multer error:', err);
+        return res
+          .status(400)
+          .json({ error: 'File upload failed.', details: err });
       }
+
+      if (!req.file) {
+        console.error('❌ No file detected');
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      console.log('✅ Middleware executed successfully, file:', req.file);
       next();
     });
   }
