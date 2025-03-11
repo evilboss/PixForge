@@ -23,7 +23,6 @@ export class CroppingController {
     @Body('height') height: string,
     @Body('format') format: string = 'webp',
   ) {
-    // Validate the file
     if (!file) {
       throw new BadRequestException('File is required');
     }
@@ -33,7 +32,6 @@ export class CroppingController {
     const parsedWidth = Number(width);
     const parsedHeight = Number(height);
 
-    // Validate that the parameters are valid numbers
     if (
       isNaN(parsedX) ||
       isNaN(parsedY) ||
@@ -45,9 +43,8 @@ export class CroppingController {
       );
     }
 
-    // Pass the file and cropping parameters to the service for cropping
     const result = await this.croppingService.cropImage(
-      file, // Pass the entire file, not just the buffer
+      file,
       parsedX,
       parsedY,
       parsedWidth,
@@ -55,10 +52,9 @@ export class CroppingController {
       format,
     );
 
-    // Structure the response with the cropped image
     const response = {
       message: 'Image cropped successfully!',
-      croppedImage: result.croppedImage.toString('base64'), // Send base64 encoded image
+      croppedImage: result.croppedImage.toString('base64'),
     };
 
     return response;
