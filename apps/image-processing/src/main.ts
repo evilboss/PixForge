@@ -1,13 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { ImageProcessingModule } from './image-processing.module';
+import { ConfigService } from '@nestjs/config';
+import { UploadMiddleware } from './image-processing.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(ImageProcessingModule);
+  const configService = app.get(ConfigService);
 
-  const port = process.env.IMAGE_PROCESSING_PORT ? parseInt(process.env.IMAGE_PROCESSING_PORT, 10) : 3001;
+  // Get the image processing service port from env or default to 4001
+  app.use(new UploadMiddleware().use);
 
+  const port = parseInt(
+    configService.get<string>('IMAGE_PROCESSING_PORT') ?? '4001',
+    4001,
+  );
   await app.listen(port);
-  console.log(`🚀 Image Processing Service running on port ${port}`);
+  console.log(`🚀 Image Processing Service is running on port ${port}`);
 }
 
 bootstrap();

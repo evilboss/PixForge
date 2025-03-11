@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ImageProcessingController } from './image-processing.controller';
-import { SharedStorageModule } from '@app/shared-storage';
+import { SharedStorageService } from '@app/shared-storage';
 
 @Module({
-  imports: [SharedStorageModule],
   controllers: [ImageProcessingController],
+  providers: [SharedStorageService],
+  exports: [SharedStorageService],
 })
 export class ImageProcessingModule {}

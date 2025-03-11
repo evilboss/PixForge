@@ -1,51 +1,40 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import sharp from 'sharp';
+import {
+  Injectable,
+  BadRequestException,
+  MethodNotAllowedException,
+} from '@nestjs/common';
+import { Express } from 'express';
+import {
+  SharedStorageService,
+  ProcessedImageResult,
+} from '@app/shared-storage';
 
 @Injectable()
 export class ImageProcessingService {
+  constructor(private readonly storageService: SharedStorageService) {}
+
   /**
-   * Convert an image buffer to WebP format
+   * Processes and stores an uploaded image
    */
-  async convertToWebP(buffer: Buffer): Promise<Buffer> {
-    try {
-      return await sharp(buffer).webp().toBuffer();
-    } catch (error) {
-      throw new InternalServerErrorException('WebP conversion failed');
+  async processImageUpload(
+    file: Express.Multer.File,
+    imageType: 'game' | 'promotion',
+  ): Promise<ProcessedImageResult> {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
     }
+
+    if (!['game', 'promotion'].includes(imageType)) {
+      throw new BadRequestException('Invalid image type');
+    }
+
+    return this.storageService.saveFile(file, 'uploads', imageType);
   }
 
   /**
-   * Resize an image to specified dimensions
+   * Rejects non-POST requests
    */
-  async resizeImage(
-    buffer: Buffer,
-    width: number,
-    height: number,
-  ): Promise<Buffer> {
-    try {
-      return await sharp(buffer).resize(width, height).toBuffer();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      throw new InternalServerErrorException('Image resizing failed');
-    }
-  }
-
-  /**
-   * Crop an image based on given dimensions
-   */
-  async cropImage(
-    buffer: Buffer,
-    left: number,
-    top: number,
-    width: number,
-    height: number,
-  ): Promise<Buffer> {
-    try {
-      return await sharp(buffer)
-        .extract({ left, top, width, height })
-        .toBuffer();
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to crop the image');
-    }
+  handleInvalidMethod() {
+    throw new MethodNotAllowedException('Only POST requests are allowed');
   }
 }
