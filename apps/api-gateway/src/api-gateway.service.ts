@@ -11,13 +11,10 @@ export class ApiGatewayService {
   ) {}
 
   async forwardRequest(service: 'image' | 'crop', req: any) {
-    // Dynamically determine target URL
     const serviceUrl =
       service === 'image'
         ? this.configService.get<string>('IMAGE_PROCESSING_URL')
         : this.configService.get<string>('IMAGE_CROPPING_URL');
-
-    console.log('serviceUrl', serviceUrl);
 
     if (!serviceUrl) {
       throw new InternalServerErrorException(
