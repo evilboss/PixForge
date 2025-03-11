@@ -19,13 +19,13 @@
         "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
       }
     },
-    "cropping-service": {
+    "cropping": {
       "type": "application",
-      "root": "apps/cropping-service",
+      "root": "apps/cropping",
       "entryFile": "main",
-      "sourceRoot": "apps/cropping-service/src",
+      "sourceRoot": "apps/cropping/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/cropping-service/tsconfig.app.json"
+        "tsConfigPath": "apps/cropping/tsconfig.app.json"
       }
     },
     "image-processing": {
