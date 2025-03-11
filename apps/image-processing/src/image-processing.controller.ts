@@ -8,19 +8,18 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageProcessingService } from './image-processing.service';
 
-@Controller() // The root path is automatically inferred
+@Controller()
 export class ImageProcessingController {
   constructor(
     private readonly imageProcessingService: ImageProcessingService,
   ) {}
 
-  @Post('/') // Explicitly bind the POST request to the root path
+  @Post('/')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @Body('imageType') imageType: 'game' | 'promotion', // Get the image type from the body
+    @Body('imageType') imageType: 'game' | 'promotion',
   ) {
-    // Validate the file and imageType directly in the controller
     if (!file) {
       throw new Error('File is required');
     }
@@ -31,17 +30,15 @@ export class ImageProcessingController {
       );
     }
 
-    // Process the image and upload it
     const result = await this.imageProcessingService.processAndStoreImage(
       file,
       imageType,
     );
 
-    // Structure the response based on the image type
     const response = {
       message: 'Image uploaded successfully!',
-      original: result.original, // The WebP file path
-      variations: result.variations, // Thumbnail or resized, based on the image type
+      original: result.original,
+      variations: result.variations,
     };
 
     return response;
