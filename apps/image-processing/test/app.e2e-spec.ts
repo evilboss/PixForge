@@ -55,7 +55,6 @@ describe('Image Processing Service (E2E)', () => {
     expect(typeof response.body.original).toBe('string');
     expect(typeof response.body.variations).toBe('object');
 
-    // Cleanup test file
     fs.unlinkSync(testFilePath);
   });
 

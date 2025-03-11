@@ -32,7 +32,7 @@ export class SharedStorageService {
     file: Express.Multer.File,
     folderPath: string,
   ): Promise<string> {
-    const filePath = path.join(folderPath, file.originalname); // Ensure it's the full file path
+    const filePath = path.join(folderPath, file.originalname);
 
     if (this.useS3) {
       return await this.uploadToS3(file, filePath);
