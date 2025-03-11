@@ -4,7 +4,12 @@ import { ApiGatewayService } from './api-gateway.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env'],
+    }),
+  ],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],
 })
