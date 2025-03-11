@@ -7,13 +7,13 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import { Express } from 'express';
-import sharp from 'sharp';
+import * as Sharp from 'sharp';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
 export interface ProcessedImageResult {
   original: string;
-  variations?: Record<string, string>;
+  variations: Record<string, string>;
 }
 
 @Injectable()
@@ -152,25 +152,23 @@ export class SharedStorageService {
       const baseFileName = path.basename(filePath, path.extname(filePath));
       const outputDir = path.dirname(filePath);
       const webpFilePath = path.join(outputDir, `${baseFileName}.webp`);
-      const variations: Record<string, string> = {};
+      const variations: Record<string, string> = {}; // ✅ Ensure variations is always defined
 
-      await sharp(filePath).toFormat('webp').toFile(webpFilePath);
-
-      console.log('webpFilePath', webpFilePath);
+      await Sharp(filePath).toFormat('webp').toFile(webpFilePath);
 
       if (imageType === 'game') {
         const thumbnailPath = path.join(
           outputDir,
           `${baseFileName}-thumbnail.webp`,
         );
-        await sharp(webpFilePath).resize(184, 256).toFile(thumbnailPath);
+        await Sharp(webpFilePath).resize(184, 256).toFile(thumbnailPath);
         variations['thumbnail'] = thumbnailPath;
       } else if (imageType === 'promotion') {
         const resizedPath = path.join(
           outputDir,
           `${baseFileName}-resized.webp`,
         );
-        await sharp(webpFilePath).resize(361, 240).toFile(resizedPath);
+        await Sharp(webpFilePath).resize(361, 240).toFile(resizedPath);
         variations['resized'] = resizedPath;
       }
 
