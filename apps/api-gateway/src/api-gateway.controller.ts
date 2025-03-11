@@ -7,78 +7,91 @@ import {
   HttpStatus,
   All,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import * as httpProxy from 'http-proxy';
+import { Request, Response } from 'express'; // Correct type for Express response
+import axios from 'axios'; // Axios to forward requests
 import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class ApiGatewayController {
-  private proxy = httpProxy.createProxyServer();
-  private cropProcessingUrl: string;
   private imageProcessingUrl: string;
+  private croppingServiceUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.cropProcessingUrl = this.configService.get<string>(
-      'CROP_PROCESSING_URL',
-      'http://localhost:4007', // Default if ENV is missing
+    const imageProcessingPort = this.configService.get<number>(
+      'IMAGE_PROCESSING_PORT',
+      4006,
     );
-    this.imageProcessingUrl = this.configService.get<string>(
-      'IMAGE_PROCESSING_URL',
-      'http://localhost:4006', // Default if ENV is missing
+    const imageCroppingPort = this.configService.get<number>(
+      'IMAGE_CROPPING_PORT',
+      4007,
     );
+
+    // Set the service URLs dynamically from environment variables
+    this.imageProcessingUrl = `http://localhost:${imageProcessingPort}/`;
+    this.croppingServiceUrl = `http://localhost:${imageCroppingPort}`;
   }
 
   /**
-   * ✅ Forward POST /crop to CROP_PROCESSING_URL
-   */
-  @Post('/crop')
-  async forwardCropProcessing(@Req() req, @Res() res) {
-    const targetUrl = this.cropProcessingUrl;
-
-    console.log(`🚀 Forwarding request to crop service: ${targetUrl}`);
-
-    this.proxy.web(req, res, { target: targetUrl }, (err) => {
-      if (err) {
-        console.error('❌ Crop request failed:', err);
-        res.status(502).json({ message: 'Failed to process crop' });
-      }
-    });
-
-    // Forwarding the response of the target service back to the client
-    this.proxy.on('proxyRes', (proxyRes, req, res) => {
-      proxyRes.pipe(res); // Pipe the response from the proxy to the client
-    });
-  }
-
-  /**
-   * ✅ Forward POST /upload to IMAGE_PROCESSING_URL
+   * Forward POST /upload requests to the Image Processing service
    */
   @Post('/upload')
-  async forwardImageProcessing(@Req() req, @Res() res) {
+  async forwardImageProcessing(@Req() req: Request, @Res() res: Response) {
     const targetUrl = this.imageProcessingUrl;
-
-    console.log(`🚀 Forwarding request to image service: ${targetUrl}`);
-
-    this.proxy.web(req, res, { target: targetUrl }, (err) => {
-      if (err) {
-        console.error('❌ Image processing failed:', err);
-        res.status(502).json({ message: 'Failed to process image' });
-      }
-    });
-
-    // Forwarding the response of the target service back to the client
-    console.log('happening here');
-    this.proxy.on('proxyRes', (proxyRes, req, res) => {
-      console.log(res);
-      proxyRes.pipe(res); // Pipe the response from the proxy to the client
-    });
+    console.log(
+      `🚀 Forwarding request to image processing service: ${targetUrl}`,
+    );
+    try {
+      const google = await axios.post(targetUrl);
+    } catch (error) {
+      console.error('google error:', error);
+    }
+    try {
+      const response = await axios.post(targetUrl, req.body, {
+        headers: req.headers, // Forward headers to the target service
+      });
+      console.log('response', response);
+      // Format the response or modify it as needed
+      return res.status(response.status).json(response.data);
+    } catch (error) {
+      console.error('Proxy error:', error);
+      throw new HttpException(
+        'Error proxying request to image processing service',
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
   }
 
   /**
-   * ❌ Respond with "Method Not Allowed" for non-POST requests
+   * Forward POST /crop requests to the Cropping service
+   */
+  @Post('/crop')
+  async forwardCropProcessing(@Req() req: Request, @Res() res: Response) {
+    const targetUrl = this.croppingServiceUrl;
+    console.log(
+      `🚀 Forwarding request to crop processing service: ${targetUrl}`,
+    );
+
+    try {
+      const response = await axios.post(targetUrl, req.body, {
+        headers: req.headers, // Forward headers to the target service
+      });
+
+      // Format the response or modify it as needed
+      return res.status(response.status).json(response.data);
+    } catch (error) {
+      console.error('Proxy error:', error);
+      throw new HttpException(
+        'Error proxying request to crop processing service',
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
+  }
+
+  /**
+   * Handle non-POST requests and return 405 Method Not Allowed
    */
   @All()
-  methodNotAllowed(@Res() res) {
+  methodNotAllowed(@Res() res: Response) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 }
