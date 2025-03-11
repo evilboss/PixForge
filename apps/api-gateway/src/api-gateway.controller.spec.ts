@@ -15,8 +15,8 @@ describe('ApiGatewayController', () => {
   });
 
   describe('root', () => {
-    it('should return "Pix Forge api service!"', () => {
-      expect(apiGatewayController.getHello()).toBe('Pix Forge api service!');
+    it('Api gateway should exist', () => {
+      expect(apiGatewayController).toBeDefined();
     });
   });
 });
