@@ -7,7 +7,6 @@ describe('CroppingController', () => {
   let controller: CroppingController;
   let croppingService: CroppingService;
 
-  // Mock the CroppingService
   const mockCroppingService = {
     cropImage: jest.fn().mockResolvedValue({
       croppedImage: Buffer.from('mocked-image'),
@@ -37,7 +36,7 @@ describe('CroppingController', () => {
 
   it('should throw BadRequestException if file is missing', async () => {
     const result = controller.cropImage(
-      null as any, // Simulate no file uploaded
+      null as any,
       '100',
       '100',
       '200',
@@ -75,14 +74,13 @@ describe('CroppingController', () => {
 
     await controller.cropImage(mockFile, x, y, width, height, format);
 
-    // Check if the cropping service was called with correct arguments
     expect(croppingService.cropImage).toHaveBeenCalledWith(
       mockFile,
-      10, // parsed value of x
-      20, // parsed value of y
-      100, // parsed value of width
-      200, // parsed value of height
-      'webp', // format
+      10,
+      20,
+      100,
+      200,
+      'webp',
     );
   });
 
@@ -105,7 +103,7 @@ describe('CroppingController', () => {
 
     expect(response).toEqual({
       message: 'Image cropped successfully!',
-      croppedImage: 'bW9ja2VkLWltYWdl', // Base64 encoded mock image (mocked-image)
+      croppedImage: 'bW9ja2VkLWltYWdl',
     });
   });
 });
