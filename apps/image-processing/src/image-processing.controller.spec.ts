@@ -11,7 +11,6 @@ describe('ImageProcessingController', () => {
   let controller: ImageProcessingController;
   let storageService: SharedStorageService;
 
-  // Mock SharedStorageService
   const mockStorageService = {
     saveFile: jest.fn().mockResolvedValue({
       original: '/uploads/test-image.webp',
@@ -35,7 +34,6 @@ describe('ImageProcessingController', () => {
     );
     storageService = module.get<SharedStorageService>(SharedStorageService);
 
-    // ✅ Ensure saveFile is properly mocked
     jest.spyOn(storageService, 'saveFile');
   });
 
@@ -67,7 +65,7 @@ describe('ImageProcessingController', () => {
     const mockFile: Express.Multer.File = {
       originalname: 'test-game.png',
       buffer: Buffer.from('test'),
-      mimetype: 'image/png', // ✅ Fix: Valid MIME type
+      mimetype: 'image/png',
       fieldname: 'file',
       encoding: '',
       size: 1000,
@@ -103,7 +101,6 @@ describe('ImageProcessingController', () => {
 
     await controller.uploadFile(mockFile);
 
-    // ✅ Correctly check that saveFile was called
     expect(storageService.saveFile).toHaveBeenCalled();
   });
 });
