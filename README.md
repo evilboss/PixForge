@@ -95,14 +95,14 @@ yarn local:cropping
 ## 📦 Docker Deployment
 ### 🚀 Default (Internal Mode)
 ```sh
-yarn docker:run
+yarn docker:start-dev
 ```
 - Uses `docker-compose.yml`
 - Services communicate internally, **not exposed to public**.
 
 ### 🌍 Exposed Mode
 ```sh
-yarn docker:run --exposed
+yarn docker:start-dev --exposed
 ```
 - Uses `docker-compose.exposed.yml`
 - Services are **publicly accessible**.
