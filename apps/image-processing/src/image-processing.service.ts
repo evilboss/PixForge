@@ -12,10 +12,10 @@ const imageTypes = {
     variation: 'thumbnail',
   },
   promotion: {
-    suffix: 'resized',
+    suffix: 'promotion',
     width: 361,
     height: 240,
-    variation: 'resized',
+    variation: 'promotion',
   },
 };
 
