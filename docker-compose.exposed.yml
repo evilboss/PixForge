@@ -64,3 +64,4 @@ services:
 networks:
   app-network:
     driver: bridge
+#TODO: Exposed microservice ports
