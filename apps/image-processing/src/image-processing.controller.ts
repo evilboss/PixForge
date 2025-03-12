@@ -4,6 +4,7 @@ import {
   UploadedFile,
   Body,
   UseInterceptors,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageProcessingService } from './image-processing.service';
@@ -42,5 +43,10 @@ export class ImageProcessingController {
     };
 
     return response;
+  }
+
+  @Get('/health')
+  async healthCheck() {
+    return 'OK';
   }
 }
