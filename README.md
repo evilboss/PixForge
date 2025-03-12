@@ -85,14 +85,7 @@ libs/
 yarn install
 ```
 
-### 2️⃣ Generate API Key
-
-```sh
-yarn generate:key
-```
-
-This **generates or updates** `API_KEY` in `.env`.
-### 3️⃣ Configure Environment
+### 2️⃣ Configure Environment
 copy environment variables:
 ```sh
 cp .env.example .env
@@ -101,8 +94,14 @@ change the values of the environment variables in the `.env` file
 see [docker-compose.yml](docker-compose.yml) for the environment variables
 if your running locally please set the `IMAGE_CROPPING_URL` and `IMAGE_PROCESSING_URL` to `http://localhost:{your-croppsing-service-port}` and `http://localhost:{your-image-processing-port}` respectively
 
-Run individual services:
+
+This **generates or updates** `API_KEY` in `.env`.
+### 3️⃣ Generate API Key
+```sh
+yarn generate:key
+```
 ### 4️⃣ Run Locally
+Run individual services:
 ```sh
 yarn local:api-gateway
 ```
