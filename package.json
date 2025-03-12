@@ -24,7 +24,9 @@
     "docker:build": "docker-compose build -d",
     "docker:build:internal": "EXPOSE_INTERNAL_SERVICES=false docker-compose up --build",
     "docker:build:exposed": "EXPOSE_INTERNAL_SERVICES=true docker-compose up --build",
+    "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
+    "docker:start-dev": "yarn docker:build && yarn docker:up",
     "local:api-gateway": "APP=api-gateway ./run_container.sh",
     "local:cropping": "APP=cropping ./run_container.sh",
     "local:image-processing": "APP=image-processing ./run_container.sh"
