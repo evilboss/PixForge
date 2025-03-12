@@ -108,7 +108,7 @@ export class ApiGatewayController {
 
       if (result.data && result.data.croppedImage) {
         res.setHeader('Content-Type', `image/${format}`);
-        res.send(result.data.croppedImage);
+        res.send(Buffer.from(result.data.croppedImage, 'base64'));
       } else {
         throw new HttpException(
           'Error cropping image',
