@@ -20,7 +20,7 @@ export class ApiGatewayController {
   private readonly imageCroppingUrl: string;
 
   constructor(private readonly httpService: HttpService) {
-    // Load URLs from environment variables
+
     this.imageProcessingUrl = process.env.IMAGE_PROCESSING_URL || 'http://image-processing:4006';
     this.imageCroppingUrl = process.env.IMAGE_CROPPING_URL || 'http://image-cropping:4007';
   }
@@ -49,7 +49,7 @@ export class ApiGatewayController {
     try {
       console.log(`Forwarding request to: ${this.imageProcessingUrl}`);
       const result = await lastValueFrom(
-        this.httpService.post(`${this.imageProcessingUrl}/process`, formData, {
+        this.httpService.post(`${this.imageProcessingUrl}`, formData, {
           headers: formHeaders,
         }),
       );
@@ -100,7 +100,7 @@ export class ApiGatewayController {
     try {
       console.log(`Forwarding request to: ${this.imageCroppingUrl}`);
       const result = await lastValueFrom(
-        this.httpService.post(`${this.imageCroppingUrl}/crop`, formData, {
+        this.httpService.post(`${this.imageCroppingUrl}`, formData, {
           headers: formHeaders,
         }),
       );
