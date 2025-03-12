@@ -13,4 +13,5 @@ RUN echo ls -R
 EXPOSE ${PORT}
 RUN chmod +x ./run_container.sh
 ENV APP=${APP}
+ENV API_KEY=${API_KEY}
 ENTRYPOINT ["/bin/bash", "./run_container.sh"]

@@ -9,7 +9,7 @@ services:
       args:
         - APP=api-gateway
         - PORT=4005
-    restart: always  # ✅ Restart if it crashes
+    restart: always
     ports:
       - "4005:4005"
     environment:
@@ -19,13 +19,14 @@ services:
       - IMAGE_PROCESSING_PORT=4006
       - IMAGE_CROPPING_HOST=http://image-cropping:4007
       - IMAGE_CROPPING_PORT=4007
+      - API_KEY=${API_KEY}
     depends_on:
       image-cropping:
         condition: service_healthy
       image-processing:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4005/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:4005/health" ]
       interval: 10s
       retries: 3
       timeout: 5s
@@ -40,12 +41,12 @@ services:
       args:
         - APP=image-processing
         - PORT=4006
-    restart: always  # ✅ Restart on failure
+    restart: always
     environment:
       - IMAGE_PROCESSING_PORT=4006
       - PORT=4006
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4006/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:4006/health" ]
       interval: 10s
       retries: 3
       timeout: 5s
@@ -60,12 +61,12 @@ services:
       args:
         - APP=cropping
         - PORT=4007
-    restart: always  # ✅ Restart on failure
+    restart: always
     environment:
       - IMAGE_CROPPING_PORT=4007
       - PORT=4007
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4007/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:4007/health" ]
       interval: 10s
       retries: 3
       timeout: 5s
