@@ -33,7 +33,6 @@ export class ApiGatewayController {
     @UploadedFile() file: Express.Multer.File,
     @Body('imageType') imageType: 'game' | 'promotion',
   ) {
-    console.log('process image hit');
 
     if (!imageType) {
       throw new HttpException('imageType is required', HttpStatus.BAD_REQUEST);
@@ -83,7 +82,6 @@ export class ApiGatewayController {
       throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
     }
 
-    console.log('file', file);
 
     const formData = new FormData();
     formData.append('file', file.buffer, {
@@ -96,8 +94,6 @@ export class ApiGatewayController {
     formData.append('width', width);
     formData.append('height', height);
     formData.append('format', format);
-
-    console.log('formData', formData);
     const formHeaders = formData.getHeaders();
 
     try {
