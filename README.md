@@ -1,4 +1,5 @@
-# Image Processing Service for CMS Integration
+# PixForge
+#### Image Processing Service for CMS Integration
 
 ## 📌 Overview
 The **Image Processing Service** is designed to process and optimize images uploaded to the CMS in a **casino platform**. It converts images to **WebP format**, generates variations based on predefined types, and provides a **cropping endpoint**. The service is built as a **NestJS microservice** and is designed for scalability and high-performance image processing.
@@ -163,7 +164,7 @@ yarn test:watch
 
 ---
 
-## 🚦 CI/CD Pipeline (GitHub Actions)
+## 🚦CI/CD Pipeline (GitHub Actions)
 This project uses **GitHub Actions** for:
 ✅ Automatic builds  
 ✅ Linting & testing  
@@ -171,6 +172,12 @@ This project uses **GitHub Actions** for:
 
 Check latest builds: **[GitHub Actions](https://github.com/evilboss/PixForge/actions)**
 
-## 👨‍💻 Author
+## 📝Issue tracking
+This project follows a structured issue tracking process using GitHub Issues. Every feature, enhancement, and bug fix has been documented through issues to maintain transparency and organization.
+
+For historical and managerial purposes, we encourage reviewing closed issues to understand the development journey, past challenges, and implemented solutions.
+
+📌 View Closed Issues: [GitHub Issue History](https://github.com/evilboss/PixForge/issues?q=is%3Aissue%20state%3Aclosed)
+
 **Jr Reyes**  
 ✉️ [jr.evilboss@gmail.com](mailto:jr.evilboss@gmail.com)
