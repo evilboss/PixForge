@@ -55,13 +55,13 @@ export class CroppingController {
         parsedHeight,
         format,
       );
-      // const response = {
-      //   message: 'Image cropped successfully!',
-      //   croppedImage: result.croppedImage.toString('base64'),
-      // };
-      // res.send(response);
-      res.setHeader('Content-Type', `image/${format}`);
-      res.send(result.croppedImage);
+      const response = {
+        message: 'Image cropped successfully!',
+        croppedImage: result.croppedImage.toString('base64'),
+      };
+      res.send(response);
+      // res.setHeader('Content-Type', `image/${format}`);
+      // res.send(result.croppedImage);
     } catch (error) {
       console.log('error', error);
       throw new BadRequestException('Error cropping image');
