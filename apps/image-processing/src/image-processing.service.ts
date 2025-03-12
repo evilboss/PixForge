@@ -4,6 +4,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SharedStorageService } from '@app/shared-storage';
 
+const imageTypes = {
+  game: {
+    suffix: 'thumbnail',
+    width: 184,
+    height: 256,
+    variation: 'thumbnail',
+  },
+  promotion: {
+    suffix: 'resized',
+    width: 361,
+    height: 240,
+    variation: 'resized',
+  },
+};
+
 @Injectable()
 export class ImageProcessingService {
   constructor(private readonly sharedStorageService: SharedStorageService) {}
@@ -35,26 +50,24 @@ export class ImageProcessingService {
 
     await this.ensureDirectoryExists(outputDir);
 
+    const { width, height, suffix, variation } = imageTypes[imageType];
+
     const webpFilePath = path.join(outputDir, `${uniqueFileName}.webp`);
     await sharp(file.buffer).webp().toFile(webpFilePath);
 
     const variations: { [key: string]: string } = {};
 
-    if (imageType === 'game') {
-      const thumbnailPath = path.join(
-        outputDir,
-        `${uniqueFileName}-thumbnail.webp`,
-      );
-      await sharp(file.buffer).resize(184, 256).webp().toFile(thumbnailPath);
-      variations['thumbnail'] = thumbnailPath;
-    } else if (imageType === 'promotion') {
-      const resizedPath = path.join(
-        outputDir,
-        `${uniqueFileName}-resized.webp`,
-      );
-      await sharp(file.buffer).resize(361, 240).webp().toFile(resizedPath);
-      variations['resized'] = resizedPath;
-    }
+    const variationFilePath = path.join(
+      outputDir,
+      `${uniqueFileName}-${suffix}.webp`,
+    );
+
+    await sharp(file.buffer)
+      .resize(width, height)
+      .webp()
+      .toFile(variationFilePath);
+
+    variations[variation] = variationFilePath;
 
     return {
       original: webpFilePath,
