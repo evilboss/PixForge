@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFile,
   ParseFilePipe,
+  Get,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
@@ -15,13 +16,19 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class ApiGatewayController {
-  constructor(private readonly httpService: HttpService) {}
+  private readonly imageProcessingUrl: string;
+  private readonly imageCroppingUrl: string;
+
+  constructor(private readonly httpService: HttpService) {
+    // Load URLs from environment variables
+    this.imageProcessingUrl = process.env.IMAGE_PROCESSING_URL || 'http://image-processing:4006';
+    this.imageCroppingUrl = process.env.IMAGE_CROPPING_URL || 'http://image-cropping:4007';
+  }
 
   @Post('process-image')
   @UseInterceptors(FileInterceptor('file'))
   async processImage(
-    @UploadedFile()
-    file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
     @Body('imageType') imageType: 'game' | 'promotion',
   ) {
     console.log('process image hit');
@@ -40,11 +47,10 @@ export class ApiGatewayController {
     const formHeaders = formData.getHeaders();
 
     try {
+      console.log(`Forwarding request to: ${this.imageProcessingUrl}`);
       const result = await lastValueFrom(
-        this.httpService.post('http://localhost:4006', formData, {
-          headers: {
-            ...formHeaders,
-          },
+        this.httpService.post(`${this.imageProcessingUrl}/process`, formData, {
+          headers: formHeaders,
         }),
       );
 
@@ -87,12 +93,14 @@ export class ApiGatewayController {
     formData.append('width', width);
     formData.append('height', height);
     formData.append('format', format);
+
     console.log('formData', formData);
     const formHeaders = formData.getHeaders();
 
     try {
+      console.log(`Forwarding request to: ${this.imageCroppingUrl}`);
       const result = await lastValueFrom(
-        this.httpService.post('http://localhost:4007', formData, {
+        this.httpService.post(`${this.imageCroppingUrl}/crop`, formData, {
           headers: formHeaders,
         }),
       );
@@ -105,5 +113,10 @@ export class ApiGatewayController {
         HttpStatus.BAD_GATEWAY,
       );
     }
+  }
+
+  @Get('/health')
+  async healthCheck() {
+    return 'OK';
   }
 }
