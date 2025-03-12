@@ -29,7 +29,8 @@
     "docker:start-dev": "yarn docker:build && yarn docker:up",
     "local:api-gateway": "APP=api-gateway ./run_container.sh",
     "local:cropping": "APP=cropping ./run_container.sh",
-    "local:image-processing": "APP=image-processing ./run_container.sh"
+    "local:image-processing": "APP=image-processing ./run_container.sh",
+    "generate:key": "node generate-key.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
