@@ -76,6 +76,24 @@ libs/
 ```
 
 ---
+## Project Requirements
+
+### 1️⃣ **Node.js 20**
+- This project is compatible with Node.js version 20.x
+- Install Node.js 20 by downloading it from the official [Node.js website](https://nodejs.org/en/blog/release/v20.18.0):
+
+### 2️⃣ Yarn
+- Yarn is used as the preferred package manager for this project.
+- Install Yarn globally via the following command:
+
+```bash
+npm install -g yarn
+```
+
+### 3️⃣ Docker (optional)
+- Docker is used for containerization and deployment.
+- Docker is required if you opt to deploy the services using Docker containers.
+- Download and install Docker from the official [Docker website](https://www.docker.com/products/docker-desktop).
 
 ## 🔧 Installation & Setup
 
