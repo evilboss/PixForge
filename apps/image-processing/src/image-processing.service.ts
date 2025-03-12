@@ -69,9 +69,11 @@ export class ImageProcessingService {
 
     variations[variation] = variationFilePath;
 
+    console.log(file.originalname)
+
     return {
       original: webpFilePath,
-      variations,
+      variations: { ...variations },
     };
   }
 
