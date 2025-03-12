@@ -13,5 +13,4 @@ if (!apiKey) {
 }
 
 const command = `API_KEY="${apiKey || ''}" docker-compose -f ${composeFile} up --build`;
-console.log(`🚀 Running: ${command}`);
 execSync(command, { stdio: 'inherit' });
