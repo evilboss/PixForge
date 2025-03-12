@@ -4,6 +4,7 @@ import {
   UploadedFile,
   Body,
   UseInterceptors,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageProcessingService } from './image-processing.service';
@@ -15,7 +16,7 @@ export class ImageProcessingController {
   ) {}
 
   @Post('/')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file')) // This needs to match the form-data field name in Postman
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body('imageType') imageType: 'game' | 'promotion',
@@ -42,5 +43,10 @@ export class ImageProcessingController {
     };
 
     return response;
+  }
+
+  @Get('/health')
+  async healthCheck() {
+    return 'OK';
   }
 }

@@ -1,97 +1,122 @@
 import {
   Controller,
   Post,
-  Req,
-  Res,
+  Body,
   HttpException,
   HttpStatus,
-  All,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  Get,
 } from '@nestjs/common';
-import { Request, Response } from 'express'; // Correct type for Express response
-import axios from 'axios'; // Axios to forward requests
-import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
+import * as FormData from 'form-data';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class ApiGatewayController {
-  private imageProcessingUrl: string;
-  private croppingServiceUrl: string;
+  private readonly imageProcessingUrl: string;
+  private readonly imageCroppingUrl: string;
 
-  constructor(private readonly configService: ConfigService) {
-    const imageProcessingPort = this.configService.get<number>(
-      'IMAGE_PROCESSING_PORT',
-      4006,
-    );
-    const imageCroppingPort = this.configService.get<number>(
-      'IMAGE_CROPPING_PORT',
-      4007,
-    );
+  constructor(private readonly httpService: HttpService) {
 
-    // Set the service URLs dynamically from environment variables
-    this.imageProcessingUrl = `http://localhost:${imageProcessingPort}/`;
-    this.croppingServiceUrl = `http://localhost:${imageCroppingPort}`;
+    this.imageProcessingUrl = process.env.IMAGE_PROCESSING_URL || 'http://image-processing:4006';
+    this.imageCroppingUrl = process.env.IMAGE_CROPPING_URL || 'http://image-cropping:4007';
   }
 
-  /**
-   * Forward POST /upload requests to the Image Processing service
-   */
-  @Post('/upload')
-  async forwardImageProcessing(@Req() req: Request, @Res() res: Response) {
-    const targetUrl = this.imageProcessingUrl;
-    console.log(
-      `🚀 Forwarding request to image processing service: ${targetUrl}`,
-    );
-    try {
-      const google = await axios.post(targetUrl);
-    } catch (error) {
-      console.error('google error:', error);
+  @Post('process-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async processImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('imageType') imageType: 'game' | 'promotion',
+  ) {
+    console.log('process image hit');
+
+    if (!imageType) {
+      throw new HttpException('imageType is required', HttpStatus.BAD_REQUEST);
     }
+
+    const formData = new FormData();
+    formData.append('file', file.buffer, {
+      filename: file.originalname,
+      contentType: file.mimetype,
+    });
+    formData.append('imageType', imageType);
+
+    const formHeaders = formData.getHeaders();
+
     try {
-      const response = await axios.post(targetUrl, req.body, {
-        headers: req.headers, // Forward headers to the target service
-      });
-      console.log('response', response);
-      // Format the response or modify it as needed
-      return res.status(response.status).json(response.data);
-    } catch (error) {
-      console.error('Proxy error:', error);
+      console.log(`Forwarding request to: ${this.imageProcessingUrl}`);
+      const result = await lastValueFrom(
+        this.httpService.post(`${this.imageProcessingUrl}`, formData, {
+          headers: formHeaders,
+        }),
+      );
+
+      return result.data;
+    } catch (e) {
+      console.error('Error forwarding the image-processing request:', e);
       throw new HttpException(
-        'Error proxying request to image processing service',
+        'Error forwarding the image-processing request',
         HttpStatus.BAD_GATEWAY,
       );
     }
   }
 
-  /**
-   * Forward POST /crop requests to the Cropping service
-   */
-  @Post('/crop')
-  async forwardCropProcessing(@Req() req: Request, @Res() res: Response) {
-    const targetUrl = this.croppingServiceUrl;
-    console.log(
-      `🚀 Forwarding request to crop processing service: ${targetUrl}`,
-    );
+  @Post('crop-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async cropImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('x') x: string,
+    @Body('y') y: string,
+    @Body('width') width: string,
+    @Body('height') height: string,
+    @Body('format') format: string = 'webp',
+  ) {
+    console.log('crop-image hit');
+
+    if (!file) {
+      throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
+    }
+
+    console.log('file', file);
+
+    const formData = new FormData();
+    formData.append('file', file.buffer, {
+      filename: file.originalname,
+      contentType: file.mimetype,
+    });
+
+    formData.append('x', x);
+    formData.append('y', y);
+    formData.append('width', width);
+    formData.append('height', height);
+    formData.append('format', format);
+
+    console.log('formData', formData);
+    const formHeaders = formData.getHeaders();
 
     try {
-      const response = await axios.post(targetUrl, req.body, {
-        headers: req.headers, // Forward headers to the target service
-      });
+      console.log(`Forwarding request to: ${this.imageCroppingUrl}`);
+      const result = await lastValueFrom(
+        this.httpService.post(`${this.imageCroppingUrl}`, formData, {
+          headers: formHeaders,
+        }),
+      );
 
-      // Format the response or modify it as needed
-      return res.status(response.status).json(response.data);
-    } catch (error) {
-      console.error('Proxy error:', error);
+      return result.data;
+    } catch (e) {
+      console.error('Error forwarding the crop-image request:', e);
       throw new HttpException(
-        'Error proxying request to crop processing service',
+        'Error forwarding the crop-image request',
         HttpStatus.BAD_GATEWAY,
       );
     }
   }
 
-  /**
-   * Handle non-POST requests and return 405 Method Not Allowed
-   */
-  @All()
-  methodNotAllowed(@Res() res: Response) {
-    return res.status(405).json({ message: 'Method Not Allowed' });
+  @Get('/health')
+  async healthCheck() {
+    return 'OK';
   }
 }

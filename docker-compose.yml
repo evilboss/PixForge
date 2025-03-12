@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP=api-gateway
+        - PORT=4005
+    restart: always  # ✅ Restart if it crashes
+    ports:
+      - "4005:4005"
+    environment:
+      - API_GATEWAY_PORT=4005
+      - PORT=4005
+      - IMAGE_PROCESSING_HOST=http://image-processing:4006
+      - IMAGE_PROCESSING_PORT=4006
+      - IMAGE_CROPPING_HOST=http://image-cropping:4007
+      - IMAGE_CROPPING_PORT=4007
+    depends_on:
+      image-cropping:
+        condition: service_healthy
+      image-processing:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4005/health"]
+      interval: 10s
+      retries: 3
+      timeout: 5s
+    networks:
+      - app-network
+
+  image-processing:
+    container_name: image-processing
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP=image-processing
+        - PORT=4006
+    restart: always  # ✅ Restart on failure
+    environment:
+      - IMAGE_PROCESSING_PORT=4006
+      - PORT=4006
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4006/health"]
+      interval: 10s
+      retries: 3
+      timeout: 5s
+    networks:
+      - app-network
+
+  image-cropping:
+    container_name: image-cropping
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP=cropping
+        - PORT=4007
+    restart: always  # ✅ Restart on failure
+    environment:
+      - IMAGE_CROPPING_PORT=4007
+      - PORT=4007
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4007/health"]
+      interval: 10s
+      retries: 3
+      timeout: 5s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
