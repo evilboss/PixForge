@@ -6,13 +6,14 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe,
   Get,
+  UseGuards,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import * as FormData from 'form-data';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiKeyGuard } from './api-key.guard';
 
 @Controller()
 export class ApiGatewayController {
@@ -26,12 +27,12 @@ export class ApiGatewayController {
   }
 
   @Post('process-image')
+  @UseGuards(ApiKeyGuard)
   @UseInterceptors(FileInterceptor('file'))
   async processImage(
     @UploadedFile() file: Express.Multer.File,
     @Body('imageType') imageType: 'game' | 'promotion',
   ) {
-    console.log('process image hit');
 
     if (!imageType) {
       throw new HttpException('imageType is required', HttpStatus.BAD_REQUEST);
@@ -65,6 +66,7 @@ export class ApiGatewayController {
   }
 
   @Post('crop-image')
+  @UseGuards(ApiKeyGuard)
   @UseInterceptors(FileInterceptor('file'))
   async cropImage(
     @UploadedFile() file: Express.Multer.File,
@@ -80,7 +82,6 @@ export class ApiGatewayController {
       throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
     }
 
-    console.log('file', file);
 
     const formData = new FormData();
     formData.append('file', file.buffer, {
@@ -93,8 +94,6 @@ export class ApiGatewayController {
     formData.append('width', width);
     formData.append('height', height);
     formData.append('format', format);
-
-    console.log('formData', formData);
     const formHeaders = formData.getHeaders();
 
     try {
