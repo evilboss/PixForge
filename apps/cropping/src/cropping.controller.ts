@@ -5,10 +5,11 @@ import {
   Body,
   UseInterceptors,
   BadRequestException,
-  Get,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CroppingService } from './cropping.service';
+import { Response } from 'express';
 
 @Controller()
 export class CroppingController {
@@ -23,6 +24,8 @@ export class CroppingController {
     @Body('width') width: string,
     @Body('height') height: string,
     @Body('format') format: string = 'webp',
+    @Body('responseType') responseType: string = 'image',
+    @Res() res: Response,
   ) {
     if (!file) {
       throw new BadRequestException('File is required');
@@ -44,25 +47,29 @@ export class CroppingController {
       );
     }
 
-    const result = await this.croppingService.cropImage(
-      file,
-      parsedX,
-      parsedY,
-      parsedWidth,
-      parsedHeight,
-      format,
-    );
-
-    const response = {
-      message: 'Image cropped successfully!',
-      croppedImage: result.croppedImage.toString('base64'),
-    };
-
-    return response;
-  }
-
-  @Get('/health')
-  async healthCheck() {
-    return 'OK';
+    try {
+      const result = await this.croppingService.cropImage(
+        file,
+        parsedX,
+        parsedY,
+        parsedWidth,
+        parsedHeight,
+        format,
+      );
+      if (responseType === 'image') {
+        res.setHeader('Content-Type', `image/${format}`);
+        res.send(result.croppedImage);
+      }
+      if (responseType === 'base64') {
+        const response = {
+          message: 'Image cropped successfully!',
+          croppedImage: result.croppedImage.toString('base64'),
+        };
+        res.send(response);
+      }
+    } catch (error) {
+      console.log('error', error);
+      throw new BadRequestException('Error cropping image');
+    }
   }
 }

@@ -180,7 +180,18 @@ curl -X POST http://localhost:4005/process-image \
      -F "file=@image.jpg" \
      -F "imageType=game"
 ```
+Example JSON Response:
+```json
 
+{
+  "message": "Image uploaded successfully!",
+  "original": "uploads/promotion/1741796210436-—Pngtree—nib and feather logo_3623556.png.webp",
+  "variations": {
+    "promotion": "uploads/promotion/1741796210436-—Pngtree—nib and feather logo_3623556.png-promotion.webp"
+  }
+}
+
+```
 ### ✂️ Crop Image
 
 ```sh
@@ -190,9 +201,18 @@ curl -X POST http://localhost:4005/crop-image \
      -F "x=10" -F "y=10" \
      -F "width=200" -F "height=200"
 ```
+Example Response:
+The response will return the image directly in the chosen format (e.g., image/webp, image/jpeg, image/png, etc.).
+
+Content-Type: image/{your_chosen_format} (e.g., image/webp)
+
+For example, if the chosen format is WebP, the response will have:
+
+```plaintext
+Content-Type: image/webp
+```
 
 ---
-
 ### ✅ Testing
 
 ```sh

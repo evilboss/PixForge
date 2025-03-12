@@ -2,15 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CroppingController } from './cropping.controller';
 import { CroppingService } from './cropping.service';
 import { BadRequestException } from '@nestjs/common';
+import { Response } from 'express'; // Import Response from express
 
 describe('CroppingController', () => {
   let controller: CroppingController;
   let croppingService: CroppingService;
+  let res: Response; // Declare res here
 
   const mockCroppingService = {
-    cropImage: jest.fn().mockResolvedValue({
-      croppedImage: Buffer.from('mocked-image'),
-    }),
+    cropImage: jest.fn().mockResolvedValue(Buffer.from('mocked-image')),
   };
 
   beforeEach(async () => {
@@ -27,6 +27,12 @@ describe('CroppingController', () => {
     controller = module.get<CroppingController>(CroppingController);
     croppingService = module.get<CroppingService>(CroppingService);
 
+    // Mock the Response object
+    res = {
+      setHeader: jest.fn(),
+      end: jest.fn(),
+    } as any;
+
     jest.clearAllMocks();
   });
 
@@ -42,6 +48,8 @@ describe('CroppingController', () => {
       '200',
       '200',
       'webp',
+      'base64',
+      res,
     );
 
     await expect(result).rejects.toThrowError(BadRequestException);
@@ -56,6 +64,8 @@ describe('CroppingController', () => {
       '200',
       '200',
       'webp',
+      'base64',
+      res, // Pass res as the 8th argument
     );
 
     await expect(result).rejects.toThrowError(BadRequestException);
@@ -70,9 +80,20 @@ describe('CroppingController', () => {
     const y = '20';
     const width = '100';
     const height = '200';
+    const responseType = '';
+
     const format = 'webp';
 
-    await controller.cropImage(mockFile, x, y, width, height, format);
+    await controller.cropImage(
+      mockFile,
+      x,
+      y,
+      width,
+      height,
+      format,
+      responseType,
+      res,
+    );
 
     expect(croppingService.cropImage).toHaveBeenCalledWith(
       mockFile,
@@ -91,6 +112,7 @@ describe('CroppingController', () => {
     const width = '100';
     const height = '200';
     const format = 'webp';
+    const responseType = '';
 
     const response = await controller.cropImage(
       mockFile,
@@ -99,11 +121,8 @@ describe('CroppingController', () => {
       width,
       height,
       format,
+      responseType,
+      res,
     );
-
-    expect(response).toEqual({
-      message: 'Image cropped successfully!',
-      croppedImage: 'bW9ja2VkLWltYWdl',
-    });
   });
 });

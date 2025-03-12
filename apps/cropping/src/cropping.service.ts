@@ -16,7 +16,6 @@ export class CroppingService {
         .extract({ left: x, top: y, width, height })
         .toFormat(format as any)
         .toBuffer();
-
       return {
         croppedImage,
       };

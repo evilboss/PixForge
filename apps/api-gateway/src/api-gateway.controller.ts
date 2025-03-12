@@ -8,12 +8,14 @@ import {
   UploadedFile,
   Get,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import * as FormData from 'form-data';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiKeyGuard } from './api-key.guard';
+import { Response } from 'express';
 
 @Controller()
 export class ApiGatewayController {
@@ -21,9 +23,10 @@ export class ApiGatewayController {
   private readonly imageCroppingUrl: string;
 
   constructor(private readonly httpService: HttpService) {
-
-    this.imageProcessingUrl = process.env.IMAGE_PROCESSING_URL || 'http://image-processing:4006';
-    this.imageCroppingUrl = process.env.IMAGE_CROPPING_URL || 'http://image-cropping:4007';
+    this.imageProcessingUrl =
+      process.env.IMAGE_PROCESSING_URL || 'http://image-processing:4006';
+    this.imageCroppingUrl =
+      process.env.IMAGE_CROPPING_URL || 'http://image-cropping:4007';
   }
 
   @Post('process-image')
@@ -33,7 +36,6 @@ export class ApiGatewayController {
     @UploadedFile() file: Express.Multer.File,
     @Body('imageType') imageType: 'game' | 'promotion',
   ) {
-
     if (!imageType) {
       throw new HttpException('imageType is required', HttpStatus.BAD_REQUEST);
     }
@@ -75,13 +77,13 @@ export class ApiGatewayController {
     @Body('width') width: string,
     @Body('height') height: string,
     @Body('format') format: string = 'webp',
+    @Res() res: Response,
   ) {
     console.log('crop-image hit');
 
     if (!file) {
       throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
     }
-
 
     const formData = new FormData();
     formData.append('file', file.buffer, {
@@ -94,6 +96,7 @@ export class ApiGatewayController {
     formData.append('width', width);
     formData.append('height', height);
     formData.append('format', format);
+    formData.append('responseType', 'base64');
     const formHeaders = formData.getHeaders();
 
     try {
@@ -104,7 +107,15 @@ export class ApiGatewayController {
         }),
       );
 
-      return result.data;
+      if (result.data && result.data.croppedImage) {
+        res.setHeader('Content-Type', `image/${format}`);
+        res.send(Buffer.from(result.data.croppedImage, 'base64'));
+      } else {
+        throw new HttpException(
+          'Error cropping image',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     } catch (e) {
       console.error('Error forwarding the crop-image request:', e);
       throw new HttpException(
