@@ -5,6 +5,7 @@ import {
   Body,
   UseInterceptors,
   BadRequestException,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CroppingService } from './cropping.service';
@@ -58,5 +59,10 @@ export class CroppingController {
     };
 
     return response;
+  }
+
+  @Get('/health')
+  async healthCheck() {
+    return 'OK';
   }
 }
