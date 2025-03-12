@@ -143,33 +143,6 @@ curl -X POST http://localhost:4005/crop-image \
 
 ---
 
-## 🛠 Available Commands
-From `package.json`, these are the most relevant commands:
-
-### 🏗 Build & Start Services
-```sh
-yarn build
-```
-```sh
-yarn start
-```
-```sh
-yarn start:dev  # Watch mode
-```
-```sh
-yarn start:prod # Production mode
-```
-
-### 🚀 Run in Docker
-```sh
-yarn docker:build
-```
-```sh
-yarn docker:up
-```
-```sh
-yarn docker:down
-```
 
 ### ✅ Testing
 ```sh
@@ -177,9 +150,6 @@ yarn test
 ```
 ```sh
 yarn test:watch
-```
-```sh
-yarn test:e2e # End-to-end tests
 ```
 
 ---
@@ -192,6 +162,14 @@ yarn test:e2e # End-to-end tests
 ✅ Easy configuration for **new image types**.
 
 ---
+
+## 🚦 CI/CD Pipeline (GitHub Actions)
+This project uses **GitHub Actions** for:
+✅ Automatic builds  
+✅ Linting & testing  
+✅ Docker image deployment
+
+Check latest builds: **[GitHub Actions](https://github.com/evilboss/PixForge/actions)**
 
 ## 👨‍💻 Author
 **Jr Reyes**  
