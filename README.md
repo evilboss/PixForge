@@ -190,7 +190,7 @@ curl -X POST http://localhost:4005/crop-image \
      -F "x=10" -F "y=10" \
      -F "width=200" -F "height=200"
 ```
-
+this will respond as image/{your chosen format} directly
 ---
 
 ### ✅ Testing
