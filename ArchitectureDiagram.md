@@ -3,8 +3,8 @@
 ```mermaid
 flowchart TD
     subgraph API Gateway [🌍 API Gateway - Public Access]
-        A[API Gateway] -->|Routes Requests| B(Image Processing Service)
-        A -->|Routes Requests| C(Image Cropping Service)
+        A[API Gateway] -->|Routes Requests| B[Image Processing Service]
+        A -->|Routes Requests| C[Image Cropping Service]
     end
 
     subgraph Microservices [⚙️ Microservices Layer]
@@ -14,14 +14,12 @@ flowchart TD
 
     subgraph Shared Library & CDN [🗄️ Shared Library & CDN Storage]
         D[Shared Library] -->|Pushes Images| E[CDN Storage]
-        E[CDN Storage] -.->|Serves Images| H[Casino Platform]
     end
 
     subgraph CMS System [📥 CMS System]
         F[CMS] -->|Uploads & Requests Processing| A
     end
 
-    subgraph Casino Platform [🎰 Casino Platform]
-        H[Casino Platform] -->|Fetches Processed Images| E
-    end
+    H[🎰 Casino Platform] -->|Fetches Processed Images| E[CDN Storage]
 ```
+
