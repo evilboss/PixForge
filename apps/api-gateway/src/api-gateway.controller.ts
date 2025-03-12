@@ -67,6 +67,7 @@ export class ApiGatewayController {
   }
 
   @Post('crop-image')
+  @UseGuards(ApiKeyGuard)
   @UseInterceptors(FileInterceptor('file'))
   async cropImage(
     @UploadedFile() file: Express.Multer.File,
