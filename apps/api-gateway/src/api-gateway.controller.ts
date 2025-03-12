@@ -96,6 +96,7 @@ export class ApiGatewayController {
     formData.append('width', width);
     formData.append('height', height);
     formData.append('format', format);
+    formData.append('responseType', 'base64');
     const formHeaders = formData.getHeaders();
 
     try {

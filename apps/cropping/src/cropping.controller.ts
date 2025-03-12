@@ -24,6 +24,7 @@ export class CroppingController {
     @Body('width') width: string,
     @Body('height') height: string,
     @Body('format') format: string = 'webp',
+    @Body('responseType') responseType: string = 'image',
     @Res() res: Response,
   ) {
     if (!file) {
@@ -55,13 +56,17 @@ export class CroppingController {
         parsedHeight,
         format,
       );
-      const response = {
-        message: 'Image cropped successfully!',
-        croppedImage: result.croppedImage.toString('base64'),
-      };
-      res.send(response);
-      // res.setHeader('Content-Type', `image/${format}`);
-      // res.send(result.croppedImage);
+      if (responseType === 'image') {
+        res.setHeader('Content-Type', `image/${format}`);
+        res.send(result.croppedImage);
+      }
+      if (responseType === 'base64') {
+        const response = {
+          message: 'Image cropped successfully!',
+          croppedImage: result.croppedImage.toString('base64'),
+        };
+        res.send(response);
+      }
     } catch (error) {
       console.log('error', error);
       throw new BadRequestException('Error cropping image');
