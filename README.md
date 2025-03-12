@@ -103,13 +103,13 @@ yarn generate:key
 ### 4️⃣ Run Locally
 Run individual services:
 ```sh
-yarn local:api-gateway
+yarn start api-gateway
 ```
 ```sh
-yarn local:image-processing
+yarn start image-processing
 ```
 ```sh
-yarn local:cropping
+yarn start cropping
 ```
 ---
 ## 📦 Docker Deployment
