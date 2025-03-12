@@ -8,12 +8,13 @@ flowchart TD
     end
 
     subgraph Microservices [⚙️ Microservices Layer]
-        B[Image Processing Service] -->|Processes & Converts| D[CDN Storage]
-        C[Image Cropping Service] -->|Crops & Saves| D[CDN Storage]
+        B[Image Processing Service] -->|Processes & Converts| D[Shared Library]
+        C[Image Cropping Service] -->|Crops & Saves| D[Shared Library]
     end
 
-    subgraph CDN & Storage [🗄️ CDN Storage & Shared Library]
-        D[CDN Storage] -.->|Stores & Serves Images| H[Casino Platform]
+    subgraph Shared Library & CDN [🗄️ Shared Library & CDN Storage]
+        D[Shared Library] -->|Pushes Images| E[CDN Storage]
+        E[CDN Storage] -.->|Serves Images| H[Casino Platform]
     end
 
     subgraph CMS System [📥 CMS System]
@@ -21,6 +22,6 @@ flowchart TD
     end
 
     subgraph Casino Platform [🎰 Casino Platform]
-        H[Casino Platform] -->|Fetches Processed Images| D
+        H[Casino Platform] -->|Fetches Processed Images| E
     end
 ```
