@@ -6,13 +6,14 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe,
   Get,
+  UseGuards,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import * as FormData from 'form-data';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiKeyGuard } from './api-key.guard';
 
 @Controller()
 export class ApiGatewayController {
@@ -26,6 +27,7 @@ export class ApiGatewayController {
   }
 
   @Post('process-image')
+  @UseGuards(ApiKeyGuard)
   @UseInterceptors(FileInterceptor('file'))
   async processImage(
     @UploadedFile() file: Express.Multer.File,
