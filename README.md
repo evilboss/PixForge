@@ -220,5 +220,6 @@ challenges, and implemented solutions.
 
 Please refer to the **[Architecture Diagram](ArchitectureDiagram.md)** for a visual representation of the service's
 architecture.
+
 **Jr Reyes**  
 ✉️ [jr.evilboss@gmail.com](mailto:jr.evilboss@gmail.com)

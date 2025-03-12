@@ -17,7 +17,11 @@ flowchart TD
         E -.->|Sends Cropped Images| C
     end
 
-    subgraph External Clients
-        F[CMS System] -->|Uploads Images| A
-        G[Casino Platform] -->|Uses Processed Images| E
+    subgraph Casino Platform
+        G[Casino Platform] -->|Fetches Processed Images| E
     end
+
+    subgraph CMS System
+        F[CMS System] -->|Uploads Images| A
+    end
+```
