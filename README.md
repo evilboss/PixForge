@@ -95,6 +95,16 @@ This **generates or updates** `API_KEY` in `.env`.
 
 ### 3️⃣ Run Locally
 
+Setting up local environment variables
+copy environment variables:
+```sh
+cp .env.example .env
+```
+change the values of the environment variables in the `.env` file
+see [docker-compose.yml](docker-compose.yml) for the environment variables
+if your running locally please set the `IMAGE_CROPPING_URL` and `IMAGE_PROCESSING_URL` to `http://localhost:{your-croppsing-service-port}` and `http://localhost:{your-image-processing-port}` respectively
+
+```sh
 Run individual services:
 
 ```sh
