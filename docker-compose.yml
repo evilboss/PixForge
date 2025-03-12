@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile  # API Gateway's Dockerfile
+    container_name: api-gateway
+    ports:
+      - "4005:4005"  # Match the port in your .env
+    environment:
+      - IMAGE_PROCESSING_HOST=image-processing-service
+      - IMAGE_PROCESSING_PORT=4006
+      - IMAGE_CROPPING_HOST=image-cropping-service
+      - IMAGE_CROPPING_PORT=4007
+    depends_on:
+      - image-processing
+      - image-cropping
+    networks:
+      - app-network
+
+  image-processing:
+    image: node:20
+    container_name: image-processing-service
+    ports:
+      - "4006:4006"
+    networks:
+      - app-network
+
+  image-cropping:
+    image: node:20
+    container_name: image-cropping-service
+    ports:
+      - "4007:4007"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

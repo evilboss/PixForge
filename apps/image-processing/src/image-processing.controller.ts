@@ -15,7 +15,7 @@ export class ImageProcessingController {
   ) {}
 
   @Post('/')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file')) // This needs to match the form-data field name in Postman
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body('imageType') imageType: 'game' | 'promotion',

@@ -1,29 +1,18 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios'; // Import HttpService
 
 @Injectable()
 export class ApiGatewayService {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly httpService: HttpService) {}
 
-  async forwardRequest(service: 'image' | 'crop', req: any) {
-    const serviceUrl =
-      service === 'image'
-        ? this.configService.get<string>('IMAGE_PROCESSING_URL')
-        : this.configService.get<string>('IMAGE_CROPPING_URL');
-
-    if (!serviceUrl) {
-      throw new InternalServerErrorException(
-        `Missing service URL for ${service}`,
-      );
+  async sendRequest() {
+    try {
+      const response = await this.httpService
+        .get('https://example.com/api/data')
+        .toPromise();
+      return response;
+    } catch (error) {
+      throw new Error('Error making HTTP request');
     }
-
-    return this.httpService.post(serviceUrl, req.body, {
-      headers: req.headers,
-    });
   }
 }
